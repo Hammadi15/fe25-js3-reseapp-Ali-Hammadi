@@ -1,5 +1,7 @@
 
+import { useSearchParams } from "react-router";
 import CountryCard from "../components/CountryCard";
+import SearchField from "../components/SearchField";
 import { useCountries } from "../hooks/useCountries";
 
 export default function HomePage() {
@@ -9,6 +11,17 @@ export default function HomePage() {
     isError,
     refetch,
   } = useCountries();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") ?? "";
+
+  function handleSearch(value: string) {
+    if (value) {
+      setSearchParams({ query: value }, { replace: true });
+    } else {
+      setSearchParams({}, { replace: true });
+    }
+  }
 
   if (isPending) {
     return (
@@ -42,6 +55,10 @@ export default function HomePage() {
     );
   }
 
+  const filteredCountries = countries.filter((country) =>
+    country.name.toLowerCase().includes(query.trim().toLowerCase())
+  );
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
       <header className="mb-8">
@@ -54,16 +71,24 @@ export default function HomePage() {
         </p>
       </header>
 
-      <ul className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {countries.map((country) => (
-          <li
-            key={country.alpha3Code}
-            className="w-full max-w-[260px]"
-          >
-            <CountryCard country={country} />
-          </li>
-        ))}
-      </ul>
+      <SearchField value={query} onChange={handleSearch} />
+
+      {filteredCountries.length === 0 ? (
+        <p className="text-gray-600">
+          Inga länder matchar dina kriterier
+        </p>
+      ) : (
+        <ul className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredCountries.map((country) => (
+            <li
+              key={country.alpha3Code}
+              className="w-full max-w-[260px]"
+            >
+              <CountryCard country={country} />
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 }
