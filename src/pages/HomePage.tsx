@@ -4,7 +4,9 @@ import CountryCard from "../components/CountryCard";
 import SearchField from "../components/SearchField";
 import { useCountries } from "../hooks/useCountries";
 import RegionFilter from "../components/RegionFilter";
+import Pagination from "../components/Pagination";
 
+const PAGE_SIZE = 12;
 export default function HomePage() {
   const {
     data: countries,
@@ -17,6 +19,9 @@ export default function HomePage() {
   const region = searchParams.get("region") ?? "All";
     const query = searchParams.get("query") ?? "";
 
+      const pageParam = Number(searchParams.get("page"));
+  const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
+
   // Ändrar en parameter i URL:en och behåller de andra
   function updateParam(key: string, value: string) {
     setSearchParams(
@@ -27,6 +32,12 @@ export default function HomePage() {
           next.set(key, value);
         } else {
           next.delete(key);
+        }
+
+        
+        // Ny sökning eller region börjar om på sida 1
+        if (key !== "page") {
+          next.delete("page");
         }
 
         return next;
@@ -42,6 +53,12 @@ export default function HomePage() {
   function handleRegion(value: string) {
     updateParam("region", value);
   
+  }
+
+  
+  function handlePage(newPage: number) {
+    updateParam("page", newPage > 1 ? String(newPage) : "");
+    window.scrollTo(0, 0);
   }
 
   if (isPending) {
@@ -85,6 +102,12 @@ export default function HomePage() {
     return matchesQuery && matchesRegion;
   });
 
+  const totalPages = Math.max(1, Math.ceil(filteredCountries.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const pageCountries = filteredCountries.slice(start, start + PAGE_SIZE);
+
+
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
       <header className="mb-8">
@@ -101,22 +124,29 @@ export default function HomePage() {
       
       <RegionFilter selected={region} onSelect={handleRegion} />
 
-
       {filteredCountries.length === 0 ? (
         <p className="text-gray-600">
           Inga länder matchar dina kriterier
         </p>
       ) : (
-        <ul className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredCountries.map((country) => (
-            <li
-              key={country.alpha3Code}
-              className="w-full max-w-[260px]"
-            >
-              <CountryCard country={country} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {pageCountries.map((country) => (
+              <li
+                key={country.alpha3Code}
+                className="w-full max-w-[260px]"
+              >
+                <CountryCard country={country} />
+              </li>
+            ))}
+          </ul>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePage}
+          />
+        </>
       )}
     </main>
   );
