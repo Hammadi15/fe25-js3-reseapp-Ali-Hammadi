@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router";
 import CountryCard from "../components/CountryCard";
 import SearchField from "../components/SearchField";
 import { useCountries } from "../hooks/useCountries";
+import RegionFilter from "../components/RegionFilter";
 
 export default function HomePage() {
   const {
@@ -13,14 +14,34 @@ export default function HomePage() {
   } = useCountries();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const query = searchParams.get("query") ?? "";
+  const region = searchParams.get("region") ?? "All";
+    const query = searchParams.get("query") ?? "";
+
+  // Ändrar en parameter i URL:en och behåller de andra
+  function updateParam(key: string, value: string) {
+    setSearchParams(
+      (previous) => {
+        const next = new URLSearchParams(previous);
+
+        if (value && value !== "All") {
+          next.set(key, value);
+        } else {
+          next.delete(key);
+        }
+
+        return next;
+      },
+      { replace: key === "query" }
+    );
+  }
 
   function handleSearch(value: string) {
-    if (value) {
-      setSearchParams({ query: value }, { replace: true });
-    } else {
-      setSearchParams({}, { replace: true });
-    }
+    updateParam("query", value);
+  }
+
+  function handleRegion(value: string) {
+    updateParam("region", value);
+  
   }
 
   if (isPending) {
@@ -55,9 +76,14 @@ export default function HomePage() {
     );
   }
 
-  const filteredCountries = countries.filter((country) =>
-    country.name.toLowerCase().includes(query.trim().toLowerCase())
-  );
+    const filteredCountries = countries.filter((country) => {
+    const matchesQuery = country.name
+      .toLowerCase()
+      .includes(query.trim().toLowerCase());
+    const matchesRegion = region === "All" || country.region === region;
+
+    return matchesQuery && matchesRegion;
+  });
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
@@ -72,6 +98,9 @@ export default function HomePage() {
       </header>
 
       <SearchField value={query} onChange={handleSearch} />
+      
+      <RegionFilter selected={region} onSelect={handleRegion} />
+
 
       {filteredCountries.length === 0 ? (
         <p className="text-gray-600">
