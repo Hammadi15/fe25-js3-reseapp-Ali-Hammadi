@@ -5,13 +5,14 @@ interface RegionFilterProps {
   onSelect: (region: string) => void;
 }
 
+// Knappar för att välja region. Den valda syns både för ögat och för skärmläsare.
 export default function RegionFilter({
   selected,
   onSelect,
 }: RegionFilterProps) {
   return (
-    <div className="mb-6">
-      <p id="region-label" className="mb-1 text-sm font-medium">
+    <div>
+      <p id="region-label" className="mb-1 text-sm font-medium text-slate-700">
         Region
       </p>
 
@@ -29,10 +30,10 @@ export default function RegionFilter({
               type="button"
               aria-pressed={isSelected}
               onClick={() => onSelect(region)}
-              className={`rounded-full border px-4 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 ${
+              className={`rounded-full border px-4 py-1.5 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 ${
                 isSelected
-                  ? "border-blue-600 bg-blue-600 text-white"
-                  : "border-gray-300 bg-white text-gray-800 hover:bg-gray-100"
+                  ? "border-emerald-700 bg-emerald-700 text-white"
+                  : "border-slate-300 bg-white text-slate-700 hover:border-emerald-500 hover:text-emerald-800"
               }`}
             >
               {region}

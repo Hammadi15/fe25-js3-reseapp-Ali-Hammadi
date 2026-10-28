@@ -7,6 +7,8 @@ import RegionFilter from "../components/RegionFilter";
 import Pagination from "../components/Pagination";
 
 const PAGE_SIZE = 12;
+
+// Startsidan med alla länder. Sök, region och sida ligger i URL:en så länken går att dela.
 export default function HomePage() {
   const {
     data: countries,
@@ -17,12 +19,12 @@ export default function HomePage() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const region = searchParams.get("region") ?? "All";
-    const query = searchParams.get("query") ?? "";
+  const query = searchParams.get("query") ?? "";
 
-      const pageParam = Number(searchParams.get("page"));
+  const pageParam = Number(searchParams.get("page"));
   const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
-  // Ändrar en parameter i URL:en och behåller de andra
+  // Ändrar en sak i URL:en men behåller resten. Nytt sök eller ny region börjar om på sida 1.
   function updateParam(key: string, value: string) {
     setSearchParams(
       (previous) => {
@@ -34,8 +36,6 @@ export default function HomePage() {
           next.delete(key);
         }
 
-        
-        // Ny sökning eller region börjar om på sida 1
         if (key !== "page") {
           next.delete("page");
         }
@@ -52,10 +52,9 @@ export default function HomePage() {
 
   function handleRegion(value: string) {
     updateParam("region", value);
-  
   }
 
-  
+  // Byter sida och scrollar upp till toppen.
   function handlePage(newPage: number) {
     updateParam("page", newPage > 1 ? String(newPage) : "");
     window.scrollTo(0, 0);
@@ -63,11 +62,11 @@ export default function HomePage() {
 
   if (isPending) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
-        <div role="status" className="flex items-center gap-3">
+      <main className="flex min-h-[60vh] items-center justify-center px-4">
+        <div role="status" className="flex items-center gap-3 text-slate-600">
           <span
             aria-hidden="true"
-            className="h-6 w-6 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"
+            className="h-6 w-6 animate-spin rounded-full border-4 border-emerald-700 border-t-transparent"
           />
           <span>Laddar länder...</span>
         </div>
@@ -77,23 +76,25 @@ export default function HomePage() {
 
   if (isError) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-8">
-        <p role="alert" className="mb-4 text-red-600">
-          Kunde inte hämta länder.
-        </p>
+      <main className="mx-auto max-w-5xl px-4 py-10">
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6">
+          <p role="alert" className="mb-4 font-medium text-red-700">
+            Kunde inte hämta länder.
+          </p>
 
-        <button
-          type="button"
-          onClick={() => void refetch()}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus-visible:outline-2 focus-visible:outline-offset-2"
-        >
-          Försök igen
-        </button>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+          >
+            Försök igen
+          </button>
+        </div>
       </main>
     );
   }
 
-    const filteredCountries = countries.filter((country) => {
+  const filteredCountries = countries.filter((country) => {
     const matchesQuery = country.name
       .toLowerCase()
       .includes(query.trim().toLowerCase());
@@ -107,35 +108,36 @@ export default function HomePage() {
   const start = (currentPage - 1) * PAGE_SIZE;
   const pageCountries = filteredCountries.slice(start, start + PAGE_SIZE);
 
-
   return (
-    <main className="mx-auto max-w-5xl px-4 py-8">
+    <main className="mx-auto max-w-5xl px-4 py-10">
       <header className="mb-8">
-        <h1 className="mb-2 text-3xl font-bold">
+        <h1 className="mb-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
           Utforska världen
         </h1>
 
-        <p className="text-gray-600">
-          Upptäck världens {countries.length} länder
+        <p className="text-slate-600">
+          Upptäck världens {countries.length} länder – sök, filtrera och läs mer om varje land.
         </p>
       </header>
 
-      <SearchField value={query} onChange={handleSearch} />
-      
-      <RegionFilter selected={region} onSelect={handleRegion} />
+      <section
+        aria-label="Sök och filtrera"
+        className="mb-8 space-y-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6"
+      >
+        <SearchField value={query} onChange={handleSearch} />
+
+        <RegionFilter selected={region} onSelect={handleRegion} />
+      </section>
 
       {filteredCountries.length === 0 ? (
-        <p className="text-gray-600">
+        <p className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center text-slate-600">
           Inga länder matchar dina kriterier
         </p>
       ) : (
         <>
-          <ul className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {pageCountries.map((country) => (
-              <li
-                key={country.alpha3Code}
-                className="w-full max-w-[260px]"
-              >
+              <li key={country.alpha3Code}>
                 <CountryCard country={country} />
               </li>
             ))}
