@@ -11,7 +11,7 @@ function App() {
       <header className="sticky top-0 z-10 bg-emerald-900 text-white shadow-md">
         <nav
           aria-label="Huvudnavigation"
-          className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-4 py-4"
+          className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4"
         >
           <Link
             to="/"

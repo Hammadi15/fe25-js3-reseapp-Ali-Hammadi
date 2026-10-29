@@ -76,7 +76,7 @@ export default function HomePage() {
 
   if (isError) {
     return (
-      <main className="mx-auto max-w-5xl px-4 py-10">
+      <main className="mx-auto max-w-7xl px-4 py-10">
         <div className="rounded-xl border border-red-200 bg-red-50 p-6">
           <p role="alert" className="mb-4 font-medium text-red-700">
             Kunde inte hämta länder.
@@ -109,7 +109,7 @@ export default function HomePage() {
   const pageCountries = filteredCountries.slice(start, start + PAGE_SIZE);
 
   return (
-    <main className="mx-auto max-w-5xl px-4 py-10">
+    <main className="mx-auto max-w-7xl px-4 py-10">
       <header className="mb-8">
         <h1 className="mb-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
           Utforska världen
@@ -135,7 +135,7 @@ export default function HomePage() {
         </p>
       ) : (
         <>
-          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {pageCountries.map((country) => (
               <li key={country.alpha3Code}>
                 <CountryCard country={country} />
