@@ -71,9 +71,8 @@ Jag har använt **Claude** (Anthropic) som hjälp under projektet. Claude hjälp
 - förklara koden rad för rad, t.ex. `useSearchParams`, filtrering och paginering
 - ta fram designen med grönt tema och färg per region på korten
 - felsöka bygget och sätta upp publiceringen på Netlify
-- skriva commit-meddelanden och den här README:n
 
-Jag har själv testat alla funktioner och gått igenom koden så att jag kan förklara den.
+Jag har själv testat alla funktioner och gått igenom koden så att projeketet funkar som den ska
 
 ## Reflektion
 
